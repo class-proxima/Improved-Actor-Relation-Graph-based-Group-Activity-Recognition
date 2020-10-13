@@ -6,7 +6,7 @@ cfg=Config('collective')
 
 cfg.device_list="0,1"
 cfg.training_stage=2
-cfg.stage1_model_path='result/STAGE1_MODEL.pth'  #PATH OF THE BASE MODEL
+cfg.stage1_model_path='result/[Collective_stage1_stage1]<2020-10-13_00-06-18>/stage1_epoch90_87.82%.pth'  #PATH OF THE BASE MODEL
 cfg.train_backbone=False
 
 cfg.image_size=480, 720

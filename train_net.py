@@ -55,7 +55,7 @@ def train_net(cfg):
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
-        device = torch.device('cuda:4')
+        device = torch.device('cuda:0')
     else:
         device = torch.device('cpu')
     
@@ -75,10 +75,11 @@ def train_net(cfg):
         assert(False)
     
     if cfg.use_multi_gpu:
-        model=nn.DataParallel(model, device_ids=[4,5,6,7])
+        model=nn.DataParallel(model, device_ids=[0,1])
 
-    model=model.to(device=device)
-    
+    # model=model.to(device=device)
+    model=model.to(f'cuda:{model.device_ids[0]}')
+
     model.train()
     model.apply(set_bn_eval)
     

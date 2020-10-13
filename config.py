@@ -30,7 +30,7 @@ class Config(object):
             self.test_seqs = [4,5,9,11,14,20,21,25,29,34,35,37,43,44,45,47]  #video id list of test set
             
         else:
-            self.data_path='../data/collective'  #data path for the collective dataset
+            self.data_path='data/collective/ActivityDataset'  #data path for the collective dataset
             self.test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29]
             self.train_seqs=[s for s in range(1,45) if s not in self.test_seqs]
         
