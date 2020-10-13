@@ -4,10 +4,11 @@ from train_net import *
 
 cfg=Config('volleyball')
 
-cfg.device_list="0,1,2,3"
+cfg.device_list="4,5,6,7"
 cfg.training_stage=1
 cfg.stage1_model_path=''
 cfg.train_backbone=True
+cfg.use_multi_gpu=True
 
 cfg.batch_size=8
 cfg.test_batch_size=4
