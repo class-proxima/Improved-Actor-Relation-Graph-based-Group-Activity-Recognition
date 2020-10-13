@@ -12,8 +12,7 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/1904.1011
 ## Dependencies
 
 - Python `3.x`
-- PyTorch `0.4.1`
-- numpy, pickle, scikit-image
+- install requirements using pip install -r requirements.txt
 - [RoIAlign for Pytorch](https://github.com/longcw/RoIAlign.pytorch)
 - Datasets: [Volleyball](https://github.com/mostafa-saad/deep-activity-rec), [Collective](http://vhosts.eecs.umich.edu/vision//activity-dataset.html)
 
