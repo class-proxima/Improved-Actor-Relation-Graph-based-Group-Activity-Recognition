@@ -85,8 +85,8 @@ class Config(object):
             time_str=time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
             self.exp_name='[%s_stage%d]<%s>'%(self.exp_note,self.training_stage,time_str)
             
-        self.result_path='result/%s'%self.exp_name
-        self.log_path='result/%s/log.txt'%self.exp_name
+        self.result_path='../result/%s'%self.exp_name
+        self.log_path='../result/%s/log.txt'%self.exp_name
             
         if need_new_folder:
             os.mkdir(self.result_path)
