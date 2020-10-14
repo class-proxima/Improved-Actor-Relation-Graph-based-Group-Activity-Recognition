@@ -65,20 +65,35 @@ def validate_net(cfg):
         GCNnet = gcnnet_list[cfg.dataset_name]
         model = GCNnet(cfg)
         # Load backbone
-        model.loadmodel(cfg.stage1_model_path)
+        #model.loadmodel(cfg.stage1_model_path)
+        checkpoint = torch.load(cfg.stage2_model_path)
+
+        # original saved file with DataParallel
+        state_dict = checkpoint["state_dict"]
+        # create new OrderedDict that does not contain `module.`
+        from collections import OrderedDict
+        new_state_dict = OrderedDict()
+        for k, v in state_dict.items():
+            name = k[7:]  # remove `module.`
+            new_state_dict[name] = v
+        # load params
+        model.load_state_dict(new_state_dict)
+
+        epoch = checkpoint['epoch']
+
 
     else:
         assert (False)
 
     if cfg.use_multi_gpu:
-        model = nn.DataParallel(model, device_ids=[4, 5, 6, 7])
+        model = nn.DataParallel(model, device_ids=[4, 5])
 
     model = model.to(device=device)
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
     test = test_list[cfg.dataset_name]
 
     if cfg.test_before_train:
-        test_info = test(validation_loader, model, device, 0, cfg)
+        test_info = test(validation_loader, model, device, epoch, cfg)
         print(test_info)
 
 
