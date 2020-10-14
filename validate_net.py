@@ -4,19 +4,6 @@ from gcn_model import *
 from base_model import *
 from utils import *
 
-
-def set_bn_eval(m):
-    classname = m.__class__.__name__
-    if classname.find('BatchNorm') != -1:
-        m.eval()
-
-
-def adjust_lr(optimizer, new_lr):
-    print('change learning rate:', new_lr)
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = new_lr
-
-
 def validate_net(cfg):
     """
     training gcn net
@@ -30,12 +17,8 @@ def validate_net(cfg):
     # Reading dataset
     training_set, validation_set = return_dataset(cfg)
 
-    params = {
-        'batch_size': cfg.batch_size,
-        'shuffle': True,
-        'num_workers': 4
-    }
-    params['batch_size'] = cfg.test_batch_size
+    params = {'batch_size': cfg.test_batch_size, 'shuffle': True, 'num_workers': 4}
+
     validation_loader = data.DataLoader(validation_set, **params)
 
     # Set random seed
@@ -64,21 +47,22 @@ def validate_net(cfg):
     elif cfg.training_stage == 3:
         GCNnet = gcnnet_list[cfg.dataset_name]
         model = GCNnet(cfg)
+
         # Load backbone
-        #model.loadmodel(cfg.stage1_model_path)
         checkpoint = torch.load(cfg.stage2_model_path)
 
         # original saved file with DataParallel
         state_dict = checkpoint["state_dict"]
+
         # create new OrderedDict that does not contain `module.`
         from collections import OrderedDict
         new_state_dict = OrderedDict()
         for k, v in state_dict.items():
             name = k[7:]  # remove `module.`
             new_state_dict[name] = v
+
         # load params
         model.load_state_dict(new_state_dict)
-
         epoch = checkpoint['epoch']
 
 
@@ -86,7 +70,7 @@ def validate_net(cfg):
         assert (False)
 
     if cfg.use_multi_gpu:
-        model = nn.DataParallel(model, device_ids=[4, 5])
+        model = nn.DataParallel(model, device_ids=[4, 5, 6, 7])
 
     model = model.to(device=device)
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
@@ -133,6 +117,7 @@ def test_volleyball(data_loader, model, device, epoch, cfg):
             actions_correct = torch.sum(torch.eq(actions_labels.int(), actions_in.int()).float())
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
+            print("Predict activities: ", activities_labels)
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
             activities_accuracy = activities_correct.item() / activities_scores.shape[0]
