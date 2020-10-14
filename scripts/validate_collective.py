@@ -5,7 +5,7 @@ sys.path.append(".")
 from train_net import *
 
 cfg=Config('collective')
-cfg.test_seqs=[5]
+cfg.test_seqs=[9]
 cfg.device_list="4,5,6,7"
 cfg.training_stage=3
 cfg.stage1_model_path='../result/STAGE1_MODEL.pth'  #PATH OF THE BASE MODEL
