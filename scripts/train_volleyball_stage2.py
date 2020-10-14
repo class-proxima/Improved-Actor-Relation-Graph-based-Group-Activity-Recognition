@@ -6,7 +6,7 @@ cfg=Config('volleyball')
 
 cfg.device_list="4,5,6,7"
 cfg.training_stage=2
-cfg.stage1_model_path='result/STAGE1_MODEL.pth'  #PATH OF THE BASE MODEL
+cfg.stage1_model_path='../result/STAGE1_MODEL.pth'  #PATH OF THE BASE MODEL
 cfg.train_backbone=False
 cfg.use_multi_gpu=True
 
