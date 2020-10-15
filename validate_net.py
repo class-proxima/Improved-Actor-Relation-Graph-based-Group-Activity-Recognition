@@ -6,7 +6,7 @@ from utils import *
 
 def validate_net(cfg):
     """
-    training gcn net
+    validating gcn net
     """
     os.environ['CUDA_VISIBLE_DEVICES'] = cfg.device_list
 
@@ -15,16 +15,11 @@ def validate_net(cfg):
     show_config(cfg)
 
     # Reading dataset
-    training_set, validation_set = return_dataset(cfg)
+    _, validation_set = return_dataset(cfg)
 
     params = {'batch_size': cfg.test_batch_size, 'shuffle': True, 'num_workers': 4}
 
     validation_loader = data.DataLoader(validation_set, **params)
-
-    # Set random seed
-    np.random.seed(cfg.train_random_seed)
-    torch.manual_seed(cfg.train_random_seed)
-    random.seed(cfg.train_random_seed)
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
@@ -40,11 +35,6 @@ def validate_net(cfg):
         Basenet = basenet_list[cfg.dataset_name]
         model = Basenet(cfg)
     elif cfg.training_stage == 2:
-        GCNnet = gcnnet_list[cfg.dataset_name]
-        model = GCNnet(cfg)
-        # Load backbone
-        model.loadmodel(cfg.stage1_model_path)
-    elif cfg.training_stage == 3:
         GCNnet = gcnnet_list[cfg.dataset_name]
         model = GCNnet(cfg)
 
@@ -76,9 +66,8 @@ def validate_net(cfg):
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
     test = test_list[cfg.dataset_name]
 
-    if cfg.test_before_train:
-        test_info = test(validation_loader, model, device, epoch, cfg)
-        print(test_info)
+    test_info = test(validation_loader, model, device, epoch, cfg)
+    print(test_info)
 
 
 def test_volleyball(data_loader, model, device, epoch, cfg):
@@ -117,7 +106,6 @@ def test_volleyball(data_loader, model, device, epoch, cfg):
             actions_correct = torch.sum(torch.eq(actions_labels.int(), actions_in.int()).float())
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
-            print("Predict activities: ", activities_labels)
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
             activities_accuracy = activities_correct.item() / activities_scores.shape[0]
@@ -188,6 +176,8 @@ def test_collective(data_loader, model, device, epoch, cfg):
             activities_loss = F.cross_entropy(activities_scores, activities_in)
             activities_labels = torch.argmax(activities_scores, dim=1)  # B,
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
+            print("Frame id: ", 1)
+            print("Predict activities: ", activities_labels)
 
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
