@@ -67,6 +67,7 @@ def validate_net(cfg):
     test = test_list[cfg.dataset_name]
 
     test_info = test(validation_loader, model, device, epoch, cfg)
+    print("On scene: ", cfg.test_seqs[0])
     print(test_info)
 
 
@@ -138,7 +139,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
     with torch.no_grad():
         i = 1
         for batch_data in data_loader:
-            ground_truth = data_loader.dataset.anns[9][i]
+            ground_truth = data_loader.dataset.anns[cfg.test_seqs[0]][i]
             # prepare batch data
             batch_data = [b.to(device=device) for b in batch_data]
             batch_size = batch_data[0].shape[0]
