@@ -28,7 +28,7 @@ def validate_net(cfg):
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
-        device = torch.device('cuda:4')
+        device = torch.device('cuda:1')
     else:
         device = torch.device('cpu')
 
@@ -70,7 +70,7 @@ def validate_net(cfg):
         assert (False)
 
     if cfg.use_multi_gpu:
-        model = nn.DataParallel(model, device_ids=[4, 5, 6, 7])
+        model = nn.DataParallel(model, device_ids=[1,2])
 
     model = model.to(device=device)
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
