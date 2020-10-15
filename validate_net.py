@@ -6,7 +6,7 @@ from utils import *
 
 def validate_net(cfg):
     """
-    training gcn net
+    validating gcn net
     """
     os.environ['CUDA_VISIBLE_DEVICES'] = cfg.device_list
 
@@ -15,16 +15,11 @@ def validate_net(cfg):
     show_config(cfg)
 
     # Reading dataset
-    training_set, validation_set = return_dataset(cfg)
+    _, validation_set = return_dataset(cfg)
 
     params = {'batch_size': cfg.test_batch_size, 'shuffle': True, 'num_workers': 4}
 
     validation_loader = data.DataLoader(validation_set, **params)
-
-    # Set random seed
-    np.random.seed(cfg.train_random_seed)
-    torch.manual_seed(cfg.train_random_seed)
-    random.seed(cfg.train_random_seed)
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
@@ -40,11 +35,6 @@ def validate_net(cfg):
         Basenet = basenet_list[cfg.dataset_name]
         model = Basenet(cfg)
     elif cfg.training_stage == 2:
-        GCNnet = gcnnet_list[cfg.dataset_name]
-        model = GCNnet(cfg)
-        # Load backbone
-        model.loadmodel(cfg.stage1_model_path)
-    elif cfg.training_stage == 3:
         GCNnet = gcnnet_list[cfg.dataset_name]
         model = GCNnet(cfg)
 
@@ -76,9 +66,9 @@ def validate_net(cfg):
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
     test = test_list[cfg.dataset_name]
 
-    if cfg.test_before_train:
-        test_info = test(validation_loader, model, device, epoch, cfg)
-        print(test_info)
+    test_info = test(validation_loader, model, device, epoch, cfg)
+    print("On scene: ", cfg.test_seqs[0])
+    print(test_info)
 
 
 def test_volleyball(data_loader, model, device, epoch, cfg):
@@ -117,7 +107,6 @@ def test_volleyball(data_loader, model, device, epoch, cfg):
             actions_correct = torch.sum(torch.eq(actions_labels.int(), actions_in.int()).float())
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
-            print("Predict activities: ", activities_labels)
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
             activities_accuracy = activities_correct.item() / activities_scores.shape[0]
@@ -148,7 +137,9 @@ def test_collective(data_loader, model, device, epoch, cfg):
 
     epoch_timer = Timer()
     with torch.no_grad():
+        i = 1
         for batch_data in data_loader:
+            ground_truth = data_loader.dataset.anns[cfg.test_seqs[0]][i]
             # prepare batch data
             batch_data = [b.to(device=device) for b in batch_data]
             batch_size = batch_data[0].shape[0]
@@ -189,6 +180,18 @@ def test_collective(data_loader, model, device, epoch, cfg):
             activities_labels = torch.argmax(activities_scores, dim=1)  # B,
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
+            # Visualize the result
+            print("Frame id: ", ground_truth["frame_id"])
+            print("Bounding box position: ", ground_truth["bboxes"])
+            print("Predict actions: ", actions_labels)
+            print("Predict activities: ", activities_labels)
+
+            # to-do: input Frame id, Bounding box position, Predict actions, Predict activities, 
+            # output visualized frame-like video with boxes around each person 
+            # and a "captioning" (predict actions in words and predict group activites in words)
+            # complete this visualize function
+            visualize(ground_truth["frame_id"], ground_truth["bboxes"], actions_labels, activities_labels)
+
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
             activities_accuracy = activities_correct.item() / activities_scores.shape[0]
@@ -199,6 +202,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
             # Total loss
             total_loss = activities_loss + cfg.actions_loss_weight * actions_loss
             loss_meter.update(total_loss.item(), batch_size)
+            i += 10
 
     test_info = {
         'time': epoch_timer.timeit(),
@@ -209,3 +213,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
     }
 
     return test_info
+
+
+def visualize(param, param1, actions_labels, activities_labels):
+    pass
