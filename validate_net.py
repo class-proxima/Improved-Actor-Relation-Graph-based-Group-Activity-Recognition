@@ -3,6 +3,11 @@ from dataset import *
 from gcn_model import *
 from base_model import *
 from utils import *
+import os
+import cv2 as cv
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+import matplotlib.colors as mcolors
 
 def validate_net(cfg):
     """
@@ -137,9 +142,11 @@ def test_collective(data_loader, model, device, epoch, cfg):
 
     epoch_timer = Timer()
     with torch.no_grad():
-        i = 1
+        i = 0
         for batch_data in data_loader:
-            ground_truth = data_loader.dataset.anns[cfg.test_seqs[0]][i]
+            sid, fid = data_loader.dataset.frames[i]
+            ground_truth = data_loader.dataset.anns[sid][fid]
+
             # prepare batch data
             batch_data = [b.to(device=device) for b in batch_data]
             batch_size = batch_data[0].shape[0]
@@ -181,7 +188,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
             # Visualize the result
-            print("Frame id: ", ground_truth["frame_id"])
+            print("Frame id: ", fid)
             print("Bounding box position: ", ground_truth["bboxes"])
             print("Predict actions: ", actions_labels)
             print("Predict activities: ", activities_labels)
@@ -190,7 +197,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
             # output visualized frame-like video with boxes around each person 
             # and a "captioning" (predict actions in words and predict group activites in words)
             # complete this visualize function
-            visualize(ground_truth["frame_id"], ground_truth["bboxes"], actions_labels, activities_labels)
+            visualize(cfg, sid, fid, ground_truth["bboxes"], actions_labels, activities_labels)
 
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
@@ -202,7 +209,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
             # Total loss
             total_loss = activities_loss + cfg.actions_loss_weight * actions_loss
             loss_meter.update(total_loss.item(), batch_size)
-            i += 10
+            i += 1
 
     test_info = {
         'time': epoch_timer.timeit(),
@@ -215,5 +222,29 @@ def test_collective(data_loader, model, device, epoch, cfg):
     return test_info
 
 
-def visualize(param, param1, actions_labels, activities_labels):
-    pass
+def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels):
+    path = os.path.join(cfg.data_path, 'seq%02d/frame%04d.jpg'%(sid,fid))
+    colors = {i:a for i,a in enumerate(mcolors.BASE_COLORS.keys())}
+    # print(colors)
+    # print('sid, fid, bboxes, actions labels:')
+    # print(sid, fid, len(bboxes), len(actions_labels.tolist()))
+    image = cv.imread(path)
+    if image is None:
+        print('Could not open or find the image: %s', path)
+        exit(0)
+
+    OH, OW = cfg.image_size
+    plt.figure()
+    plt.imshow(image)
+    axes = plt.gca()
+    for i, box in enumerate(bboxes):
+        y1, x1, y2, x2 = box
+        tmp_boxes = [y1 * OH, x1 * OW, y2 * OH, x2 * OW]
+        bb = np.array(tmp_boxes, dtype=np.int32)
+        rect = Rectangle((bb[1], bb[0]), bb[3] - bb[1], bb[2] - bb[0], fill=False, color=colors[2])
+        axes.add_patch(rect)
+    # plt.show()
+    plt.savefig(cfg.save_path+'/seq%02d_frame%04d.jpg'%(sid,fid))
+    plt.close()
+
+

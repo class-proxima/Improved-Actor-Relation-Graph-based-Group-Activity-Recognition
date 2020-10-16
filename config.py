@@ -78,15 +78,19 @@ class Config(object):
         self.test_before_train=False
         self.exp_note='Group-Activity-Recognition'
         self.exp_name=None
+        self.annotation_name=None
         
         
     def init_config(self, need_new_folder=True):
         if self.exp_name is None:
             time_str=time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
             self.exp_name='[%s_stage%d]<%s>'%(self.exp_note,self.training_stage,time_str)
+            self.annotation_name='[%s_annotations]<%s>'%(self.exp_note,time_str)
             
         self.result_path='result/%s'%self.exp_name
         self.log_path='result/%s/log.txt'%self.exp_name
+        self.save_path='result/%s'%self.annotation_name
             
         if need_new_folder:
-            os.mkdir(self.result_path)
+            os.makedirs(self.result_path)
+            os.makedirs(self.save_path)
