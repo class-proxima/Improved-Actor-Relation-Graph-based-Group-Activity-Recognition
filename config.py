@@ -31,8 +31,8 @@ class Config(object):
             
         else:
             self.data_path='data/collective/ActivityDataset'  #data path for the collective dataset
-            self.test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29]
-            self.train_seqs=[s for s in range(1,45) if s not in self.test_seqs]
+            self.test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29,51,53,58,59,60,64,66,68,70,71]
+            self.train_seqs=[s for s in range(1,73) if s not in self.test_seqs]
         
         # Backbone 
         self.backbone='inv3' 
@@ -85,12 +85,13 @@ class Config(object):
         if self.exp_name is None:
             time_str=time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
             self.exp_name='[%s_stage%d]<%s>'%(self.exp_note,self.training_stage,time_str)
-            self.annotation_name='[%s_annotations]<%s>'%(self.exp_note,time_str)
             
         self.result_path='result/%s'%self.exp_name
         self.log_path='result/%s/log.txt'%self.exp_name
-        self.save_path='result/%s'%self.annotation_name
             
         if need_new_folder:
             os.makedirs(self.result_path)
-            os.makedirs(self.save_path)
+        if self.training_stage == 3:
+            self.annotation_name = '[%s_annotations]<%s>' % (self.exp_note, time_str)
+            save_path = 'result/%s' % self.annotation_name
+            os.makedirs(save_path)

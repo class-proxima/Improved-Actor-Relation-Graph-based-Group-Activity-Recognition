@@ -11,8 +11,8 @@ cfg.train_backbone=True
 cfg.image_size=480, 720
 cfg.out_size=57,87
 cfg.num_boxes=13
-cfg.num_actions=6
-cfg.num_activities=5
+cfg.num_actions=8
+cfg.num_activities=7
 cfg.num_frames=10
 
 cfg.batch_size=16

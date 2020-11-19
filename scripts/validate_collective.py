@@ -9,7 +9,7 @@ cfg.test_seqs=[9,10]
 cfg.stage1_model_path='result/[Collective_stage1_stage1]<2020-10-13_00-06-18>/stage1_epoch90_87.82%.pth'  #PATH OF THE BASE MODEL
 cfg.stage2_model_path='result/[Collective_stage2_stage2]<2020-10-13_09-36-37>/stage2_epoch32_86.80%.pth'   #PATH OF THE BASE MODEL
 cfg.device_list="1, 2"
-cfg.training_stage=2
+cfg.training_stage=3
 
 cfg.train_backbone=False
 cfg.test_before_train=True
