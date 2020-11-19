@@ -1,14 +1,13 @@
 import sys
 sys.path.append(".")
-from train_net import *
 from validate_net import *
 
 cfg=Config('collective')
-cfg.test_seqs=[9,10]
+cfg.test_seqs=[9, 64]
 
-cfg.stage1_model_path='result/[Collective_stage1_stage1]<2020-10-13_00-06-18>/stage1_epoch90_87.82%.pth'  #PATH OF THE BASE MODEL
-cfg.stage2_model_path='result/[Collective_stage2_stage2]<2020-10-13_09-36-37>/stage2_epoch32_86.80%.pth'   #PATH OF THE BASE MODEL
-cfg.device_list="1, 2"
+cfg.stage1_model_path='result/stage1_epoch82_91.38%.pth'  #PATH OF THE BASE MODEL
+cfg.stage2_model_path='result/stage2_epoch30_91.97%.pth'   #PATH OF THE BASE MODEL
+cfg.device_list="0,1"
 cfg.training_stage=3
 
 cfg.train_backbone=False
@@ -16,8 +15,8 @@ cfg.test_before_train=True
 cfg.image_size=480, 720
 cfg.out_size=57,87
 cfg.num_boxes=13
-cfg.num_actions=6
-cfg.num_activities=5
+cfg.num_actions=8
+cfg.num_activities=7
 cfg.num_frames=10
 cfg.num_graph=4
 cfg.tau_sqrt=True

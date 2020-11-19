@@ -79,6 +79,7 @@ class Config(object):
         self.exp_note='Group-Activity-Recognition'
         self.exp_name=None
         self.annotation_name=None
+        self.save_path = None
         
         
     def init_config(self, need_new_folder=True):
@@ -93,5 +94,5 @@ class Config(object):
             os.makedirs(self.result_path)
         if self.training_stage == 3:
             self.annotation_name = '[%s_annotations]<%s>' % (self.exp_note, time_str)
-            save_path = 'result/%s' % self.annotation_name
-            os.makedirs(save_path)
+            self.save_path = 'result/%s' % self.annotation_name
+            os.makedirs(self.save_path)

@@ -3,6 +3,7 @@ from dataset import *
 from gcn_model import *
 from base_model import *
 from utils import *
+from collective import FRAMES_SIZE
 import os
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -39,7 +40,7 @@ def validate_net(cfg):
     if cfg.training_stage == 1:
         Basenet = basenet_list[cfg.dataset_name]
         model = Basenet(cfg)
-    elif cfg.training_stage == 2:
+    elif cfg.training_stage == 3:
         GCNnet = gcnnet_list[cfg.dataset_name]
         model = GCNnet(cfg)
 
@@ -188,10 +189,17 @@ def test_collective(data_loader, model, device, epoch, cfg):
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
             # Visualize the result
-            print("Frame id: ", fid)
-            print("Bounding box position: ", ground_truth["bboxes"])
-            print("Predict actions: ", actions_labels)
-            print("Predict activities: ", activities_labels)
+            # print("Frame id: ", fid)
+            # print("Bounding box position: ", ground_truth["bboxes"])
+            # print("Predict actions: ", actions_labels)
+            # print("Predict activities: ", activities_labels)
+
+            if len(ground_truth["bboxes"]) != actions_labels.shape[0]:
+                print("Frame id: ", fid)
+                print("# of gt bboxes", len(ground_truth["bboxes"]))
+                print("# of predicted action", actions_labels.shape[0])
+                print("Predict actions: ", actions_labels)
+                print("Predict activities: ", activities_labels)
 
             # to-do: input Frame id, Bounding box position, Predict actions, Predict activities, 
             # output visualized frame-like video with boxes around each person 
@@ -233,7 +241,7 @@ def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels):
         print('Could not open or find the image: %s', path)
         exit(0)
 
-    OH, OW = cfg.image_size
+    OH, OW = FRAMES_SIZE[sid]
     plt.figure()
     plt.imshow(image)
     axes = plt.gca()
