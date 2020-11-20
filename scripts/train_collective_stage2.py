@@ -6,14 +6,14 @@ cfg=Config('collective')
 
 cfg.device_list="0,1"
 cfg.training_stage=2
-cfg.stage1_model_path='../result/STAGE1_MODEL.pth'  #PATH OF THE BASE MODEL
+cfg.stage1_model_path='result/stage1_epoch82_91.38%.pth'  #PATH OF THE BASE MODEL
 cfg.train_backbone=False
 
 cfg.image_size=480, 720
 cfg.out_size=57,87
 cfg.num_boxes=13
-cfg.num_actions=6
-cfg.num_activities=5
+cfg.num_actions=8
+cfg.num_activities=7
 cfg.num_frames=10
 cfg.num_graph=4
 cfg.tau_sqrt=True

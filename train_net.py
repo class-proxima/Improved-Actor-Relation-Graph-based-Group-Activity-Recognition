@@ -75,10 +75,11 @@ def train_net(cfg):
         assert(False)
     
     if cfg.use_multi_gpu:
-        model=nn.DataParallel(model, device_ids=[0,1,2,3])
+        model=nn.DataParallel(model, device_ids=[0,1])
 
-    model=model.to(device=device)
-    
+    # model=model.to(device=device)
+    model=model.to(f'cuda:{model.device_ids[0]}')
+
     model.train()
     model.apply(set_bn_eval)
     

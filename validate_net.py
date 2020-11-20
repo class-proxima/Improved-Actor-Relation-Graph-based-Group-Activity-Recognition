@@ -3,6 +3,13 @@ from dataset import *
 from gcn_model import *
 from base_model import *
 from utils import *
+from collective import FRAMES_SIZE, ACTIONS, ACTIVITIES
+import os
+import cv2 as cv
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+import matplotlib.patches as mpatches
+import matplotlib.colors as mcolors
 
 def validate_net(cfg):
     """
@@ -23,7 +30,7 @@ def validate_net(cfg):
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
-        device = torch.device('cuda:4')
+        device = torch.device('cuda:1')
     else:
         device = torch.device('cpu')
 
@@ -34,7 +41,7 @@ def validate_net(cfg):
     if cfg.training_stage == 1:
         Basenet = basenet_list[cfg.dataset_name]
         model = Basenet(cfg)
-    elif cfg.training_stage == 2:
+    elif cfg.training_stage == 3:
         GCNnet = gcnnet_list[cfg.dataset_name]
         model = GCNnet(cfg)
 
@@ -60,7 +67,7 @@ def validate_net(cfg):
         assert (False)
 
     if cfg.use_multi_gpu:
-        model = nn.DataParallel(model, device_ids=[4, 5, 6, 7])
+        model = nn.DataParallel(model, device_ids=[1,2])
 
     model = model.to(device=device)
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
@@ -135,11 +142,20 @@ def test_collective(data_loader, model, device, epoch, cfg):
     activities_meter = AverageMeter()
     loss_meter = AverageMeter()
 
+    colors = {i: a for i, a in enumerate(
+        mcolors.TABLEAU_COLORS.keys())}  # {0: 'tab:blue', 1: 'tab:orange', 2: 'tab:green', 3: 'tab:red', 4: 'tab:purple', 5: 'tab:brown', 6: 'tab:pink', 7: 'tab:gray', 8: 'tab:olive', 9: 'tab:cyan'}
+    legends = []
+    for i, action in enumerate(ACTIONS):
+        patch = mpatches.Patch(color=colors[i], label=ACTIONS[i], fill=False, linewidth=1.2)
+        legends.append(patch)
+
     epoch_timer = Timer()
     with torch.no_grad():
-        i = 1
+        i = 0
         for batch_data in data_loader:
-            ground_truth = data_loader.dataset.anns[cfg.test_seqs[0]][i]
+            sid, fid = data_loader.dataset.frames[i]
+            ground_truth = data_loader.dataset.anns[sid][fid]
+
             # prepare batch data
             batch_data = [b.to(device=device) for b in batch_data]
             batch_size = batch_data[0].shape[0]
@@ -181,16 +197,25 @@ def test_collective(data_loader, model, device, epoch, cfg):
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
             # Visualize the result
-            print("Frame id: ", ground_truth["frame_id"])
-            print("Bounding box position: ", ground_truth["bboxes"])
-            print("Predict actions: ", actions_labels)
-            print("Predict activities: ", activities_labels)
+            # print("Frame id: ", fid)
+            # print("Bounding box position: ", ground_truth["bboxes"])
+            # print("Predict actions: ", actions_labels)
+            # print("Predict activities: ", activities_labels)
 
-            # to-do: input Frame id, Bounding box position, Predict actions, Predict activities, 
-            # output visualized frame-like video with boxes around each person 
+            if len(ground_truth["bboxes"]) != actions_labels.shape[0]:
+                print("Frame id: ", fid)
+                print("# of gt bboxes", len(ground_truth["bboxes"]))
+                print("# of predicted action", actions_labels.shape[0])
+                print("Predict actions: ", actions_labels)
+                print("Predict activities: ", activities_labels)
+            num_draw_bboxes = min(len(ground_truth["bboxes"]), actions_labels.shape[0])
+
+            # to-do: input Frame id, Bounding box position, Predict actions, Predict activities,
+            # output visualized frame-like video with boxes around each person
             # and a "captioning" (predict actions in words and predict group activites in words)
             # complete this visualize function
-            visualize(ground_truth["frame_id"], ground_truth["bboxes"], actions_labels, activities_labels)
+            visualize(cfg, sid, fid, ground_truth["bboxes"], actions_labels.cpu().detach().numpy(),
+                      activities_labels.cpu().detach().numpy(), num_draw_bboxes, colors, legends)
 
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
@@ -202,7 +227,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
             # Total loss
             total_loss = activities_loss + cfg.actions_loss_weight * actions_loss
             loss_meter.update(total_loss.item(), batch_size)
-            i += 10
+            i += 1
 
     test_info = {
         'time': epoch_timer.timeit(),
@@ -215,5 +240,30 @@ def test_collective(data_loader, model, device, epoch, cfg):
     return test_info
 
 
-def visualize(param, param1, actions_labels, activities_labels):
-    pass
+def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels, num_draw_bboxes, colors, legends):
+    path = os.path.join(cfg.data_path, 'seq%02d/frame%04d.jpg'%(sid,fid))
+    image = cv.imread(path)
+    if image is None:
+        print('Could not open or find the image: %s', path)
+        exit(0)
+
+    OH, OW = FRAMES_SIZE[sid]
+    plt.figure()
+    plt.imshow(image)
+    axes = plt.gca()
+    axes.get_xaxis().set_ticks([])
+    axes.get_yaxis().set_ticks([])
+
+    for i in range(num_draw_bboxes):
+        y1, x1, y2, x2 = bboxes[i]
+        tmp_boxes = [y1 * OH, x1 * OW, y2 * OH, x2 * OW]
+        bb = np.array(tmp_boxes, dtype=np.int32)
+        rect = Rectangle((bb[1], bb[0]), bb[3] - bb[1], bb[2] - bb[0], fill=False, color=colors[actions_labels[i]], linewidth=1.4)
+        axes.add_patch(rect)
+    # plt.show()
+    plt.subplots_adjust(top=0.9)
+    plt.legend(handles=legends, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=4)
+    plt.savefig(cfg.save_path+'/seq%02d_frame%04d.jpg'%(sid,fid))
+    plt.close()
+
+
