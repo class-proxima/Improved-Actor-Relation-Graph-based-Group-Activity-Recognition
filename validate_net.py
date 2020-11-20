@@ -3,11 +3,12 @@ from dataset import *
 from gcn_model import *
 from base_model import *
 from utils import *
-from collective import FRAMES_SIZE
+from collective import FRAMES_SIZE, ACTIONS, ACTIVITIES
 import os
 import cv2 as cv
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
+import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 
 def validate_net(cfg):
@@ -141,6 +142,13 @@ def test_collective(data_loader, model, device, epoch, cfg):
     activities_meter = AverageMeter()
     loss_meter = AverageMeter()
 
+    colors = {i: a for i, a in enumerate(
+        mcolors.TABLEAU_COLORS.keys())}  # {0: 'tab:blue', 1: 'tab:orange', 2: 'tab:green', 3: 'tab:red', 4: 'tab:purple', 5: 'tab:brown', 6: 'tab:pink', 7: 'tab:gray', 8: 'tab:olive', 9: 'tab:cyan'}
+    legends = []
+    for i, action in enumerate(ACTIONS):
+        patch = mpatches.Patch(color=colors[i], label=ACTIONS[i], fill=False, linewidth=1.2)
+        legends.append(patch)
+
     epoch_timer = Timer()
     with torch.no_grad():
         i = 0
@@ -200,12 +208,14 @@ def test_collective(data_loader, model, device, epoch, cfg):
                 print("# of predicted action", actions_labels.shape[0])
                 print("Predict actions: ", actions_labels)
                 print("Predict activities: ", activities_labels)
+            num_draw_bboxes = min(len(ground_truth["bboxes"]), actions_labels.shape[0])
 
-            # to-do: input Frame id, Bounding box position, Predict actions, Predict activities, 
-            # output visualized frame-like video with boxes around each person 
+            # to-do: input Frame id, Bounding box position, Predict actions, Predict activities,
+            # output visualized frame-like video with boxes around each person
             # and a "captioning" (predict actions in words and predict group activites in words)
             # complete this visualize function
-            visualize(cfg, sid, fid, ground_truth["bboxes"], actions_labels, activities_labels)
+            visualize(cfg, sid, fid, ground_truth["bboxes"], actions_labels.cpu().detach().numpy(),
+                      activities_labels.cpu().detach().numpy(), num_draw_bboxes, colors, legends)
 
             # Get accuracy
             actions_accuracy = actions_correct.item() / actions_scores.shape[0]
@@ -230,12 +240,8 @@ def test_collective(data_loader, model, device, epoch, cfg):
     return test_info
 
 
-def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels):
+def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels, num_draw_bboxes, colors, legends):
     path = os.path.join(cfg.data_path, 'seq%02d/frame%04d.jpg'%(sid,fid))
-    colors = {i:a for i,a in enumerate(mcolors.BASE_COLORS.keys())}
-    # print(colors)
-    # print('sid, fid, bboxes, actions labels:')
-    # print(sid, fid, len(bboxes), len(actions_labels.tolist()))
     image = cv.imread(path)
     if image is None:
         print('Could not open or find the image: %s', path)
@@ -245,13 +251,18 @@ def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels):
     plt.figure()
     plt.imshow(image)
     axes = plt.gca()
-    for i, box in enumerate(bboxes):
-        y1, x1, y2, x2 = box
+    axes.get_xaxis().set_ticks([])
+    axes.get_yaxis().set_ticks([])
+
+    for i in range(num_draw_bboxes):
+        y1, x1, y2, x2 = bboxes[i]
         tmp_boxes = [y1 * OH, x1 * OW, y2 * OH, x2 * OW]
         bb = np.array(tmp_boxes, dtype=np.int32)
-        rect = Rectangle((bb[1], bb[0]), bb[3] - bb[1], bb[2] - bb[0], fill=False, color=colors[2])
+        rect = Rectangle((bb[1], bb[0]), bb[3] - bb[1], bb[2] - bb[0], fill=False, color=colors[actions_labels[i]], linewidth=1.4)
         axes.add_patch(rect)
     # plt.show()
+    plt.subplots_adjust(top=0.9)
+    plt.legend(handles=legends, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=4)
     plt.savefig(cfg.save_path+'/seq%02d_frame%04d.jpg'%(sid,fid))
     plt.close()
 
