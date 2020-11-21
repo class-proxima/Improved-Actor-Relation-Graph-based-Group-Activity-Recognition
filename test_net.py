@@ -16,6 +16,7 @@ def test_net(cfg):
     test gcn net
     """
     os.environ['CUDA_VISIBLE_DEVICES'] = cfg.device_list
+    devices = list(map(int, cfg.device_list.split(',')))
 
     # Show config parameters
     cfg.init_config()
@@ -30,7 +31,7 @@ def test_net(cfg):
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
-        device = torch.device('cuda:0')
+        device = torch.device('cuda', devices[0])
     else:
         device = torch.device('cpu')
 
@@ -67,7 +68,7 @@ def test_net(cfg):
         assert (False)
 
     if cfg.use_multi_gpu:
-        model = nn.DataParallel(model, device_ids=[0,1])
+        model = nn.DataParallel(model, device_ids=devices)
 
     model=model.to(f'cuda:{model.device_ids[0]}')
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}

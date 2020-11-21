@@ -285,24 +285,31 @@ class GCNnet_collective(nn.Module):
         K=self.cfg.crop_size[0]
         NFB=self.cfg.num_features_boxes
         NFR, NFG=self.cfg.num_features_relation, self.cfg.num_features_gcn
-        
-        # self.backbone=MyInception_v3(transform_input=False,pretrained=True)
-        self.backbone = MyMobileNet(pretrained=True)
+
+        if cfg.backbone == 'inv3':
+            self.backbone = MyInception_v3(transform_input=False, pretrained=True)
+        elif cfg.backbone == 'vgg16':
+            self.backbone = MyVGG16(pretrained=True)
+        elif cfg.backbone == 'vgg19':
+            self.backbone = MyVGG19(pretrained=True)
+        elif cfg.backbone == 'mobilenet':
+            self.backbone = MyMobileNet(pretrained=True)
+        else:
+            assert False
         
         if not self.cfg.train_backbone:
             for p in self.backbone.parameters():
                 p.requires_grad=False
         
         self.roi_align=RoIAlign(*self.cfg.crop_size)
-        
-        # self.fc_emb_1=nn.Linear(K*K*D,NFB)
-        self.fc_emb_1 = nn.Linear(32000, NFB)
+        if cfg.backbone == 'inv3':
+            self.fc_emb_1 = nn.Linear(K * K * D, NFB)
+        elif cfg.backbone == 'mobilenet':
+            self.fc_emb_1 = nn.Linear(32000, NFB)
+
         self.nl_emb_1=nn.LayerNorm([NFB])
-        
-        
         self.gcn_list = torch.nn.ModuleList([ GCN_Module(self.cfg)  for i in range(self.cfg.gcn_layers) ])    
-        
-        
+
         self.dropout_global=nn.Dropout(p=self.cfg.train_dropout_prob)
     
         self.fc_actions=nn.Linear(NFG,self.cfg.num_actions)
