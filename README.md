@@ -14,14 +14,14 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/1904.1011
 - Python `3.x`
 - install requirements using `pip install -r requirements.txt`
 - [RoIAlign for Pytorch](https://github.com/longcw/RoIAlign.pytorch)
-- Datasets: [Volleyball](https://github.com/mostafa-saad/deep-activity-rec), [Collective](http://vhosts.eecs.umich.edu/vision//activity-dataset.html)
-
+- Datasets: [Volleyball](https://github.com/mostafa-saad/deep-activity-rec), [Collective](http://vhosts.eecs.umich.edu/vision//activity-dataset.html) and [augmented dataset]
+(http://vhosts.eecs.umich.edu/vision//activity-dataset.html)
 
 
 
 ## Prepare Datasets
 
-1. Download [volleyball](http://vml.cs.sfu.ca/wp-content/uploads/volleyballdataset/volleyball.zip) or [collective](http://vhosts.eecs.umich.edu/vision//ActivityDataset.zip) dataset file.
+1. Download [volleyball](http://vml.cs.sfu.ca/wp-content/uploads/volleyballdataset/volleyball.zip) or both [collective](http://vhosts.eecs.umich.edu/vision//ActivityDataset.zip) and [augmented dataset](http://vhosts.eecs.umich.edu/vision//ActivityDataset2.tar.gz) dataset file.
 2. Unzip the dataset file into `data/volleyball` or `data/collective`.
 
 
@@ -51,8 +51,12 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/1904.1011
     
     You can specify the running arguments in the python files under `scripts/` directory. The meanings of arguments can be found in `config.py`
 
-
-
+3. Test: Test the result using test video clips.
+    ```shell
+    # collective dataset
+    python scripts/test_collective.py
+    ```
+    
 ## Citation
 
 ```
