@@ -31,7 +31,7 @@ class Config(object):
             
         else:
             self.data_path='data/collective/ActivityDataset'  #data path for the collective dataset
-            self.test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29,51,53,58,59,60,64,66,68,70,71]
+            self.test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29,52,53,59,60,64,66,68,70,71]
             self.train_seqs=[s for s in range(1,73) if s not in self.test_seqs]
         
         # Backbone 
@@ -78,9 +78,6 @@ class Config(object):
         self.test_before_train=False
         self.exp_note='Group-Activity-Recognition'
         self.exp_name=None
-        self.annotation_name=None
-        self.save_path = None
-        
         
     def init_config(self, need_new_folder=True):
         if self.exp_name is None:
@@ -92,7 +89,3 @@ class Config(object):
             
         if need_new_folder:
             os.makedirs(self.result_path)
-        if self.training_stage == 3:
-            self.annotation_name = '[%s_annotations]<%s>' % (self.exp_note, time_str)
-            self.save_path = 'result/%s' % self.annotation_name
-            os.makedirs(self.save_path)
