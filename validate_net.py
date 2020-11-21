@@ -30,7 +30,7 @@ def validate_net(cfg):
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
-        device = torch.device('cuda:1')
+        device = torch.device('cuda:6')
     else:
         device = torch.device('cpu')
 
@@ -67,9 +67,9 @@ def validate_net(cfg):
         assert (False)
 
     if cfg.use_multi_gpu:
-        model = nn.DataParallel(model, device_ids=[1,2])
+        model = nn.DataParallel(model, device_ids=[6,7])
 
-    model = model.to(device=device)
+    model=model.to(f'cuda:{model.device_ids[0]}')
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
     test = test_list[cfg.dataset_name]
 
@@ -146,7 +146,7 @@ def test_collective(data_loader, model, device, epoch, cfg):
         mcolors.TABLEAU_COLORS.keys())}  # {0: 'tab:blue', 1: 'tab:orange', 2: 'tab:green', 3: 'tab:red', 4: 'tab:purple', 5: 'tab:brown', 6: 'tab:pink', 7: 'tab:gray', 8: 'tab:olive', 9: 'tab:cyan'}
     legends = []
     for i, action in enumerate(ACTIONS):
-        patch = mpatches.Patch(color=colors[i], label=ACTIONS[i], fill=False, linewidth=1.2)
+        patch = mpatches.Patch(color=colors[i], label=ACTIONS[i], fill=False, linewidth=2)
         legends.append(patch)
 
     epoch_timer = Timer()
@@ -248,22 +248,23 @@ def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels, num_draw
         exit(0)
 
     OH, OW = FRAMES_SIZE[sid]
-    plt.figure()
+    plt.figure(facecolor='black')
     plt.imshow(image)
     axes = plt.gca()
     axes.get_xaxis().set_ticks([])
     axes.get_yaxis().set_ticks([])
+    axes.text(0.5, 0.95, ACTIVITIES[activities_labels[0]], style='italic', verticalalignment='top', horizontalalignment='center',
+              weight='bold', bbox={'facecolor': 'green', 'alpha': 0.6, 'pad': 0.5, 'boxstyle':'round'},
+              color='yellow', fontsize=14, transform=axes.transAxes)
 
     for i in range(num_draw_bboxes):
         y1, x1, y2, x2 = bboxes[i]
         tmp_boxes = [y1 * OH, x1 * OW, y2 * OH, x2 * OW]
         bb = np.array(tmp_boxes, dtype=np.int32)
-        rect = Rectangle((bb[1], bb[0]), bb[3] - bb[1], bb[2] - bb[0], fill=False, color=colors[actions_labels[i]], linewidth=1.4)
+        rect = Rectangle((bb[1], bb[0]), bb[3] - bb[1], bb[2] - bb[0], fill=False, color=colors[actions_labels[i]], linewidth=2)
         axes.add_patch(rect)
     # plt.show()
     plt.subplots_adjust(top=0.9)
     plt.legend(handles=legends, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=4)
     plt.savefig(cfg.save_path+'/seq%02d_frame%04d.jpg'%(sid,fid))
     plt.close()
-
-

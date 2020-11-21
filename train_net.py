@@ -55,7 +55,7 @@ def train_net(cfg):
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
-        device = torch.device('cuda:0')
+        device = torch.device('cuda:6')
     else:
         device = torch.device('cpu')
     
@@ -66,6 +66,7 @@ def train_net(cfg):
     if cfg.training_stage==1:
         Basenet=basenet_list[cfg.dataset_name]
         model=Basenet(cfg)
+        print(model)
     elif cfg.training_stage==2:
         GCNnet=gcnnet_list[cfg.dataset_name]
         model=GCNnet(cfg)
@@ -75,7 +76,7 @@ def train_net(cfg):
         assert(False)
     
     if cfg.use_multi_gpu:
-        model=nn.DataParallel(model, device_ids=[0,1])
+        model=nn.DataParallel(model, device_ids=[6,7])
 
     # model=model.to(device=device)
     model=model.to(f'cuda:{model.device_ids[0]}')
@@ -97,6 +98,7 @@ def train_net(cfg):
     # Training iteration
     best_result={'epoch':0, 'activities_acc':0}
     start_epoch=1
+    timer = Timer()
     for epoch in range(start_epoch, start_epoch+cfg.max_epoch):
         
         if epoch in cfg.lr_plan:
@@ -134,6 +136,7 @@ def train_net(cfg):
 #                         print('model saved to:',filepath)
             else:
                 assert False
+    print_log(cfg.log_path, 'Total used time %.1f seconds.' % (timer.totaltime()))
     
    
 def train_volleyball(data_loader, model, device, optimizer, epoch, cfg):

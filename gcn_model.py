@@ -286,7 +286,8 @@ class GCNnet_collective(nn.Module):
         NFB=self.cfg.num_features_boxes
         NFR, NFG=self.cfg.num_features_relation, self.cfg.num_features_gcn
         
-        self.backbone=MyInception_v3(transform_input=False,pretrained=True)
+        # self.backbone=MyInception_v3(transform_input=False,pretrained=True)
+        self.backbone = MyMobileNet(pretrained=True)
         
         if not self.cfg.train_backbone:
             for p in self.backbone.parameters():
@@ -294,7 +295,8 @@ class GCNnet_collective(nn.Module):
         
         self.roi_align=RoIAlign(*self.cfg.crop_size)
         
-        self.fc_emb_1=nn.Linear(K*K*D,NFB)
+        # self.fc_emb_1=nn.Linear(K*K*D,NFB)
+        self.fc_emb_1 = nn.Linear(32000, NFB)
         self.nl_emb_1=nn.LayerNorm([NFB])
         
         
@@ -316,7 +318,7 @@ class GCNnet_collective(nn.Module):
         
 
     def loadmodel(self,filepath):
-        state = torch.load(filepath)
+        state = torch.load(filepath, map_location='cpu')
         self.backbone.load_state_dict(state['backbone_state_dict'])
         self.fc_emb_1.load_state_dict(state['fc_emb_state_dict'])
         print('Load model states from: ',filepath)
@@ -400,7 +402,7 @@ class GCNnet_collective(nn.Module):
             boxes_features=boxes_features_all[b,:,:N,:].reshape(1,T*N,NFB)  #1,T,N,NFB
         
             boxes_positions=boxes_in[b,:,:N,:].reshape(T*N,4)  #T*N, 4
-        
+
             # GCN graph modeling
             for i in range(len(self.gcn_list)):
                 graph_boxes_features,relation_graph=self.gcn_list[i](boxes_features,boxes_positions)
