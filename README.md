@@ -14,8 +14,7 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/1904.1011
 - Python `3.x`
 - install requirements using `pip install -r requirements.txt`
 - [RoIAlign for Pytorch](https://github.com/longcw/RoIAlign.pytorch)
-- Datasets: [Volleyball](https://github.com/mostafa-saad/deep-activity-rec), [Collective](http://vhosts.eecs.umich.edu/vision//activity-dataset.html) and [augmented dataset]
-(http://vhosts.eecs.umich.edu/vision//activity-dataset.html)
+- Datasets: [Volleyball](https://github.com/mostafa-saad/deep-activity-rec), [Collective](http://vhosts.eecs.umich.edu/vision//activity-dataset.html) and [Augmented dataset](http://vhosts.eecs.umich.edu/vision//activity-dataset.html)
 
 
 
