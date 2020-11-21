@@ -47,8 +47,6 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/1904.1011
     # collective dataset
     python scripts/train_collective_stage2.py
     ```
-    
-    You can specify the running arguments in the python files under `scripts/` directory. The meanings of arguments can be found in `config.py`
 
 3. Test: Test the result using test video clips.
     ```shell
@@ -56,6 +54,8 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/1904.1011
     python scripts/test_collective.py
     ```
     
+    You can specify the running arguments in the python files under `scripts/` directory. The meanings of arguments can be found in `config.py`
+
 ## Citation
 
 ```
