@@ -1,12 +1,12 @@
 import sys
 sys.path.append(".")
-from validate_net import *
+from test_net import *
 
 cfg=Config('collective')
 cfg.test_seqs=[9, 64]
 
-cfg.stage1_model_path='result/stage1_epoch82_91.38%.pth'  #PATH OF THE BASE MODEL
-cfg.stage2_model_path='result/stage2_epoch30_91.97%.pth'   #PATH OF THE BASE MODEL
+cfg.stage1_model_path='result/stage1_epoch36_91.75%.pth'  #PATH OF THE BASE MODEL
+cfg.stage2_model_path='result/stage2_epoch4_92.31%.pth'   #PATH OF THE BASE MODEL
 cfg.device_list="0,1"
 cfg.training_stage=3
 
@@ -29,5 +29,5 @@ cfg.weight_decay=1e-2
 cfg.lr_plan={}
 cfg.max_epoch=50
 
-cfg.exp_note='Collective_validate'
-validate_net(cfg)
+cfg.exp_note='Collective_test'
+test_net(cfg)
