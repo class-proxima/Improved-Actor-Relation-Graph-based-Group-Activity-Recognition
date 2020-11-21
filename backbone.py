@@ -94,3 +94,16 @@ class MyVGG19(nn.Module):
     def forward(self,x):
         x=self.features(x)
         return [x]
+
+
+class MyMobileNet(nn.Module):
+    def __init__(self, pretrained=False):
+        super(MyMobileNet, self).__init__()
+
+        mobileNet = models.mobilenet_v2(pretrained=pretrained)
+
+        self.features = mobileNet.features
+
+    def forward(self, x):
+        x = self.features(x)
+        return [x]

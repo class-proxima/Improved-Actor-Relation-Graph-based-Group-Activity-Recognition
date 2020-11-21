@@ -151,8 +151,14 @@ class Timer(object):
     """
     def __init__(self):
         self.last_time=time.time()
+        self.init_time=time.time()
+        self.total_time = 0
         
     def timeit(self):
         old_time=self.last_time
         self.last_time=time.time()
         return self.last_time-old_time
+
+    def totaltime(self):
+        self.total_time = time.time() - self.init_time
+        return self.total_time

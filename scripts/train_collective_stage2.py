@@ -6,8 +6,9 @@ cfg=Config('collective')
 
 cfg.device_list="0,1"
 cfg.training_stage=2
-cfg.stage1_model_path= 'result/stage1_epoch36_91.75%.pth'  #PATH OF THE BASE MODELcfg.stage1_model_path='result/stage1_epoch82_91.38%.pth'  #PATH OF THE BASE MODEL
+cfg.stage1_model_path='result/stage1_mn_epoch84_90.26%.pth'  #PATH OF THE BASE MODEL
 cfg.train_backbone=False
+cfg.backbone='mobilenet'
 
 cfg.image_size=480, 720
 cfg.out_size=57,87

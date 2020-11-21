@@ -30,7 +30,8 @@ def train_net(cfg):
     training gcn net
     """
     os.environ['CUDA_VISIBLE_DEVICES']=cfg.device_list
-    
+    devices=list(map(int, cfg.device_list.split(',')))
+
     # Show config parameters
     cfg.init_config()
     show_config(cfg)
@@ -55,7 +56,7 @@ def train_net(cfg):
 
     # Set data position
     if cfg.use_gpu and torch.cuda.is_available():
-        device = torch.device('cuda:0')
+        device = torch.device('cuda', devices[0])
     else:
         device = torch.device('cpu')
     
@@ -73,11 +74,12 @@ def train_net(cfg):
         model.loadmodel(cfg.stage1_model_path)
     else:
         assert(False)
-    
-    if cfg.use_multi_gpu:
-        model=nn.DataParallel(model, device_ids=[0,1])
 
-    # model=model.to(device=device)
+    print(model)
+
+    if cfg.use_multi_gpu:
+        model=nn.DataParallel(model, device_ids=devices)
+
     model=model.to(f'cuda:{model.device_ids[0]}')
 
     model.train()
@@ -97,6 +99,7 @@ def train_net(cfg):
     # Training iteration
     best_result={'epoch':0, 'activities_acc':0}
     start_epoch=1
+    timer = Timer()
     for epoch in range(start_epoch, start_epoch+cfg.max_epoch):
         
         if epoch in cfg.lr_plan:
@@ -134,6 +137,7 @@ def train_net(cfg):
 #                         print('model saved to:',filepath)
             else:
                 assert False
+    print_log(cfg.log_path, 'Total used time %.1f seconds.' % (timer.totaltime()))
     
    
 def train_volleyball(data_loader, model, device, optimizer, epoch, cfg):

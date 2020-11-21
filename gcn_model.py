@@ -285,22 +285,31 @@ class GCNnet_collective(nn.Module):
         K=self.cfg.crop_size[0]
         NFB=self.cfg.num_features_boxes
         NFR, NFG=self.cfg.num_features_relation, self.cfg.num_features_gcn
-        
-        self.backbone=MyInception_v3(transform_input=False,pretrained=True)
+
+        if cfg.backbone == 'inv3':
+            self.backbone = MyInception_v3(transform_input=False, pretrained=True)
+        elif cfg.backbone == 'vgg16':
+            self.backbone = MyVGG16(pretrained=True)
+        elif cfg.backbone == 'vgg19':
+            self.backbone = MyVGG19(pretrained=True)
+        elif cfg.backbone == 'mobilenet':
+            self.backbone = MyMobileNet(pretrained=True)
+        else:
+            assert False
         
         if not self.cfg.train_backbone:
             for p in self.backbone.parameters():
                 p.requires_grad=False
         
         self.roi_align=RoIAlign(*self.cfg.crop_size)
-        
-        self.fc_emb_1=nn.Linear(K*K*D,NFB)
+        if cfg.backbone == 'inv3':
+            self.fc_emb_1 = nn.Linear(K * K * D, NFB)
+        elif cfg.backbone == 'mobilenet':
+            self.fc_emb_1 = nn.Linear(32000, NFB)
+
         self.nl_emb_1=nn.LayerNorm([NFB])
-        
-        
         self.gcn_list = torch.nn.ModuleList([ GCN_Module(self.cfg)  for i in range(self.cfg.gcn_layers) ])    
-        
-        
+
         self.dropout_global=nn.Dropout(p=self.cfg.train_dropout_prob)
     
         self.fc_actions=nn.Linear(NFG,self.cfg.num_actions)
@@ -316,7 +325,7 @@ class GCNnet_collective(nn.Module):
         
 
     def loadmodel(self,filepath):
-        state = torch.load(filepath)
+        state = torch.load(filepath, map_location='cpu')
         self.backbone.load_state_dict(state['backbone_state_dict'])
         self.fc_emb_1.load_state_dict(state['fc_emb_state_dict'])
         print('Load model states from: ',filepath)
@@ -400,7 +409,7 @@ class GCNnet_collective(nn.Module):
             boxes_features=boxes_features_all[b,:,:N,:].reshape(1,T*N,NFB)  #1,T,N,NFB
         
             boxes_positions=boxes_in[b,:,:N,:].reshape(T*N,4)  #T*N, 4
-        
+
             # GCN graph modeling
             for i in range(len(self.gcn_list)):
                 graph_boxes_features,relation_graph=self.gcn_list[i](boxes_features,boxes_positions)

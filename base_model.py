@@ -159,17 +159,28 @@ class Basenet_collective(nn.Module):
         K=self.cfg.crop_size[0]
         NFB=self.cfg.num_features_boxes
         NFR, NFG=self.cfg.num_features_relation, self.cfg.num_features_gcn
-        
-        self.backbone=MyInception_v3(transform_input=False,pretrained=True)
-#         self.backbone=MyVGG16(pretrained=True)
+
+        if cfg.backbone == 'inv3':
+            self.backbone = MyInception_v3(transform_input=False, pretrained=True)
+        elif cfg.backbone == 'vgg16':
+            self.backbone = MyVGG16(pretrained=True)
+        elif cfg.backbone == 'vgg19':
+            self.backbone = MyVGG19(pretrained=True)
+        elif cfg.backbone == 'mobilenet':
+            self.backbone = MyMobileNet(pretrained=True)
+        else:
+            assert False
         
         if not self.cfg.train_backbone:
             for p in self.backbone.parameters():
                 p.requires_grad=False
         
         self.roi_align=RoIAlign(*self.cfg.crop_size)
-        
-        self.fc_emb_1=nn.Linear(K*K*D,NFB)
+        if cfg.backbone == 'inv3':
+            self.fc_emb_1 = nn.Linear(K * K * D, NFB)
+        elif cfg.backbone == 'mobilenet':
+            self.fc_emb_1 = nn.Linear(32000, NFB)
+
         self.dropout_emb_1 = nn.Dropout(p=self.cfg.train_dropout_prob)
 #         self.nl_emb_1=nn.LayerNorm([NFB])
         
@@ -251,7 +262,8 @@ class Basenet_collective(nn.Module):
         
         boxes_features_all=boxes_features_all.reshape(B*T,MAX_N,-1)  #B*T,MAX_N, D*K*K
         
-        # Embedding 
+        # Embedding
+        # print(boxes_features_all.shape)
         boxes_features_all=self.fc_emb_1(boxes_features_all)  # B*T,MAX_N, NFB
         boxes_features_all=F.relu(boxes_features_all)
         boxes_features_all=self.dropout_emb_1(boxes_features_all)
