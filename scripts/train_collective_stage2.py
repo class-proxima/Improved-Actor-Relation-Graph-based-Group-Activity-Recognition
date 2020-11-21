@@ -6,7 +6,7 @@ cfg=Config('collective')
 
 cfg.device_list="0,1"
 cfg.training_stage=2
-cfg.stage1_model_path='result/stage1_epoch82_91.38%.pth'  #PATH OF THE BASE MODEL
+cfg.stage1_model_path= 'result/stage1_epoch36_91.75%.pth'  #PATH OF THE BASE MODELcfg.stage1_model_path='result/stage1_epoch82_91.38%.pth'  #PATH OF THE BASE MODEL
 cfg.train_backbone=False
 
 cfg.image_size=480, 720
@@ -26,5 +26,5 @@ cfg.weight_decay=1e-2
 cfg.lr_plan={}
 cfg.max_epoch=50
 
-cfg.exp_note='Collective_stage2'
+cfg.exp_note='Collective_train'
 train_net(cfg)

@@ -11,9 +11,9 @@ from matplotlib.patches import Rectangle
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 
-def validate_net(cfg):
+def test_net(cfg):
     """
-    validating gcn net
+    test gcn net
     """
     os.environ['CUDA_VISIBLE_DEVICES'] = cfg.device_list
 
@@ -258,10 +258,12 @@ def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels, num_draw
         bb = np.array(tmp_boxes, dtype=np.int32)
         rect = Rectangle((bb[1], bb[0]), bb[3] - bb[1], bb[2] - bb[0], fill=False, color=colors[actions_labels[i]], linewidth=1.4)
         axes.add_patch(rect)
-    plt.show()
+
     plt.subplots_adjust(top=0.9)
     plt.legend(handles=legends, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=4)
-    plt.savefig(cfg.save_path+'/seq%02d_frame%04d.jpg'%(sid,fid))
+    plt.gcf()
+    plt.savefig(cfg.result_path+'/seq%02d_frame%04d.jpg'%(sid,fid))
+    plt.show()
     plt.close()
 
 
