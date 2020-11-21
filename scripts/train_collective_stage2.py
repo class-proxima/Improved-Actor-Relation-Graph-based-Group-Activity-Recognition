@@ -4,7 +4,7 @@ from train_net import *
 
 cfg=Config('collective')
 
-cfg.device_list="6,7"
+cfg.device_list="0,1"
 cfg.training_stage=2
 cfg.stage1_model_path='result/stage1_mn_epoch84_90.26%.pth'  #PATH OF THE BASE MODEL
 cfg.train_backbone=False

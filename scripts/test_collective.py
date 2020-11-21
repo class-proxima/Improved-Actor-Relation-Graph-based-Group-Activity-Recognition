@@ -5,8 +5,8 @@ from test_net import *
 cfg=Config('collective')
 cfg.test_seqs=[9, 64]
 
-cfg.stage1_model_path='result/stage1_epoch36_91.75%.pth'  #PATH OF THE BASE MODEL
-cfg.stage2_model_path='result/stage2_epoch4_92.31%.pth'   #PATH OF THE BASE MODEL
+cfg.stage1_model_path='result/stage1_mn_epoch84_90.26%.pth'  #PATH OF THE BASE MODEL
+cfg.stage2_model_path='result/stage2_mn_epoch16_84.47%.pth'   #PATH OF THE BASE MODEL
 cfg.device_list="0,1"
 cfg.training_stage=3
 
