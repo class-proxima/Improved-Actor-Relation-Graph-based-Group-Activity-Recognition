@@ -1,3 +1,5 @@
+import pickle
+import numpy as np
 import torch
 import time
 
@@ -92,8 +94,8 @@ def show_epoch_info(phase, log_path, info):
     else:
         print_log(log_path, '%s at epoch #%d'%(phase, info['epoch']))
         
-    print_log(log_path, 'Group Activity Accuracy: %.2f%%, Loss: %.5f, Using %.1f seconds'%(
-                info['activities_acc'], info['loss'], info['time']))
+    print_log(log_path, 'Group Activity Accuracy: %.2f%%, Individual Actions Accuracy: %.2f%%, Loss: %.5f, Using %.1f seconds'%(
+                info['activities_acc'], info['actions_acc'], info['loss'], info['time']))
         
 def log_final_exp_result(log_path, data_path, exp_result):
     no_display_cfg=['num_workers', 'use_gpu', 'use_multi_gpu', 'device_list',
