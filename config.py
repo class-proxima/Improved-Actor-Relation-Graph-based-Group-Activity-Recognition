@@ -74,7 +74,8 @@ class Config(object):
         
         # Exp
         self.training_stage=1  #specify stage1 or stage2
-        self.stage1_model_path=''  #path of the base model, need to be set in stage2
+        self.stage1_model_path='result/stage1_epoch88_89.39%.pth'   #path of the base model, need to be set in stage2
+        self.stage2_model_path = 'result/stage2_epoch38_88.27%.pth'  #path of the gcn model, need to be set in stage3
         self.test_before_train=False
         self.exp_note='Group-Activity-Recognition'
         self.exp_name=None
