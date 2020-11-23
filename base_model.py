@@ -1,14 +1,6 @@
-import torch 
-import torch.nn as nn
-import torch.nn.functional as F 
-
-import numpy as np
-
 from backbone import *
 from utils import *
 from roi_align.roi_align import RoIAlign      # RoIAlign module
-from roi_align.roi_align import CropAndResize # crop_and_resize module
-
 
 class Basenet_volleyball(nn.Module):
     """
@@ -158,7 +150,6 @@ class Basenet_collective(nn.Module):
         D=self.cfg.emb_features
         K=self.cfg.crop_size[0]
         NFB=self.cfg.num_features_boxes
-        NFR, NFG=self.cfg.num_features_relation, self.cfg.num_features_gcn
 
         if cfg.backbone == 'inv3':
             self.backbone = MyInception_v3(transform_input=False, pretrained=True)
@@ -182,9 +173,6 @@ class Basenet_collective(nn.Module):
             self.fc_emb_1 = nn.Linear(32000, NFB)
 
         self.dropout_emb_1 = nn.Dropout(p=self.cfg.train_dropout_prob)
-#         self.nl_emb_1=nn.LayerNorm([NFB])
-        
-        
         self.fc_actions=nn.Linear(NFB,self.cfg.num_actions)
         self.fc_activities=nn.Linear(NFB,self.cfg.num_activities)
         
@@ -221,11 +209,6 @@ class Basenet_collective(nn.Module):
         OH, OW=self.cfg.out_size
         MAX_N=self.cfg.num_boxes
         NFB=self.cfg.num_features_boxes
-        NFR, NFG=self.cfg.num_features_relation, self.cfg.num_features_gcn
-        EPS=1e-5
-        
-        D=self.cfg.emb_features
-        K=self.cfg.crop_size[0]
         
         # Reshape the input data
         images_in_flat=torch.reshape(images_in,(B*T,3,H,W))  #B*T, 3, H, W

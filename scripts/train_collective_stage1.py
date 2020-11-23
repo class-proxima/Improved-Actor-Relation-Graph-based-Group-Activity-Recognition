@@ -3,8 +3,6 @@ sys.path.append(".")
 from train_net import *
 
 cfg=Config('collective')
-
-cfg.device_list="0,1"
 cfg.training_stage=1
 cfg.train_backbone=True
 cfg.backbone='mobilenet'

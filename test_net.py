@@ -12,9 +12,9 @@ import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 
 def test_net(cfg):
-    """
+    '''
     test gcn net
-    """
+    '''
     os.environ['CUDA_VISIBLE_DEVICES'] = cfg.device_list
     devices = list(map(int, cfg.device_list.split(',')))
 
@@ -50,7 +50,7 @@ def test_net(cfg):
         checkpoint = torch.load(cfg.stage2_model_path)
 
         # original saved file with DataParallel
-        state_dict = checkpoint["state_dict"]
+        state_dict = checkpoint['state_dict']
 
         # create new OrderedDict that does not contain `module.`
         from collections import OrderedDict
@@ -70,14 +70,15 @@ def test_net(cfg):
     if cfg.use_multi_gpu:
         model = nn.DataParallel(model, device_ids=devices)
 
+    timer = Timer()
     model=model.to(f'cuda:{model.device_ids[0]}')
     test_list = {'volleyball': test_volleyball, 'collective': test_collective}
     test = test_list[cfg.dataset_name]
 
     test_info = test(validation_loader, model, device, epoch, cfg)
-    print("On scene: ", cfg.test_seqs[0])
-    print(test_info)
-
+    show_epoch_info('Test', cfg.log_path, test_info)
+    print_log(cfg.log_path, test_info)
+    print_log(cfg.log_path, 'Total used time %.1f seconds.' % (timer.totaltime()))
 
 def test_volleyball(data_loader, model, device, epoch, cfg):
     model.eval()
@@ -198,22 +199,22 @@ def test_collective(data_loader, model, device, epoch, cfg):
             activities_correct = torch.sum(torch.eq(activities_labels.int(), activities_in.int()).float())
 
             # Visualize the result
-            # print("Frame id: ", fid)
-            # print("Bounding box position: ", ground_truth["bboxes"])
-            # print("Predict actions: ", actions_labels)
-            # print("Predict activities: ", activities_labels)
+            # print('Frame id: ', fid)
+            # print('Bounding box position: ', ground_truth['bboxes'])
+            # print('Predict actions: ', actions_labels)
+            # print('Predict activities: ', activities_labels)
 
-            if len(ground_truth["bboxes"]) != actions_labels.shape[0]:
-                print("Frame id: ", fid)
-                print("# of gt bboxes", len(ground_truth["bboxes"]))
-                print("# of predicted action", actions_labels.shape[0])
-                print("Predict actions: ", actions_labels)
-                print("Predict activities: ", activities_labels)
-            num_draw_bboxes = min(len(ground_truth["bboxes"]), actions_labels.shape[0])
+            if len(ground_truth['bboxes']) != actions_labels.shape[0]:
+                print_log(cfg.log_path, 'Frame id: ' + str(fid))
+                print_log(cfg.log_path, '# of gt bboxes' + str(len(ground_truth['bboxes'])))
+                print_log(cfg.log_path, '# of predicted action' + str(actions_labels.shape[0]))
+                print_log(cfg.log_path, 'Predict actions: ' + str(actions_labels))
+                print_log(cfg.log_path, 'Predict activities: ' + str(activities_labels))
+            num_draw_bboxes = min(len(ground_truth['bboxes']), actions_labels.shape[0])
 
             # output visualized frame-like video with boxes around each person
-            # and a "captioning" (predict actions in words and predict group activites in words)
-            visualize(cfg, sid, fid, ground_truth["bboxes"], actions_labels.cpu().detach().numpy(),
+            # and a 'captioning' (predict actions in words and predict group activites in words)
+            visualize(cfg, sid, fid, ground_truth['bboxes'], actions_labels.cpu().detach().numpy(),
                       activities_labels.cpu().detach().numpy(), num_draw_bboxes, colors, legends)
 
             # Get accuracy
@@ -267,5 +268,5 @@ def visualize(cfg, sid, fid, bboxes, actions_labels, activities_labels, num_draw
     plt.legend(handles=legends, loc='upper center', bbox_to_anchor=(0.5, -0.05), fancybox=True, shadow=True, ncol=4)
     plt.gcf()
     plt.savefig(cfg.result_path+'/seq%02d_frame%04d.jpg'%(sid,fid))
-    plt.show()
+    #plt.show()
     plt.close()
