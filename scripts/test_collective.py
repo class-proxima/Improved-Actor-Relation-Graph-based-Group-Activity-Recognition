@@ -5,7 +5,6 @@ from test_net import *
 cfg=Config('collective')
 cfg.training_stage=3
 cfg.test_seqs=[9, 64]
-cfg.backbone='mobilenet'
 
 cfg.train_backbone=False
 cfg.test_before_train=True
@@ -26,5 +25,5 @@ cfg.weight_decay=1e-2
 cfg.lr_plan={}
 cfg.max_epoch=50
 
-cfg.exp_note='Collective_test'
+cfg.exp_note='Collective_test_' + cfg.backbone
 test_net(cfg)
