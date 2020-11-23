@@ -26,5 +26,5 @@ cfg.weight_decay=1e-2
 cfg.lr_plan={}
 cfg.max_epoch=50
 
-cfg.exp_note='Collective_test'
+cfg.exp_note='Collective_test_' + cfg.backbone
 test_net(cfg)

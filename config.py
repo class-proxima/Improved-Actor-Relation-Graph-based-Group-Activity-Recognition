@@ -17,7 +17,7 @@ class Config(object):
         # Gpu
         self.use_gpu=True
         self.use_multi_gpu=True   
-        self.device_list="4,5,6,7"  #id list of gpus used for training
+        self.device_list="0,1"  #id list of gpus used for training
         
         # Dataset
         assert(dataset_name in ['volleyball', 'collective'])
@@ -35,7 +35,8 @@ class Config(object):
             self.train_seqs=[s for s in range(1,73) if s not in self.test_seqs]
         
         # Backbone 
-        self.backbone='inv3' 
+        self.backbone='inv3'
+        #self.backbone='mobilenet'
         self.crop_size = 5, 5  #crop size of roi align
         self.train_backbone = False  #if freeze the feature extraction part of network, True for stage 1, False for stage 2
         self.out_size = 87, 157  #output feature map size of backbone 
@@ -75,7 +76,7 @@ class Config(object):
         # Exp
         self.training_stage=1  #specify stage1 or stage2
         self.stage1_model_path='result/stage1_epoch88_89.39%.pth'   #path of the base model, need to be set in stage2
-        self.stage2_model_path = 'result/stage2_epoch38_88.27%.pth'  #path of the gcn model, need to be set in stage3
+        self.stage2_model_path='result/stage2_epoch84_90.65%.pth'   #path of the gcn model, need to be set in stage3
         self.test_before_train=False
         self.exp_note='Group-Activity-Recognition'
         self.exp_name=None

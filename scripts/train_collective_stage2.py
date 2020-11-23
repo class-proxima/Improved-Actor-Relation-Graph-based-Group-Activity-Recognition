@@ -5,7 +5,6 @@ from train_net import *
 cfg=Config('collective')
 cfg.training_stage=2
 cfg.train_backbone=False
-cfg.backbone='mobilenet'
 
 cfg.image_size=480, 720
 cfg.out_size=57,87
@@ -24,5 +23,5 @@ cfg.weight_decay=1e-2
 cfg.lr_plan={}
 cfg.max_epoch=100
 
-cfg.exp_note='Collective_train'
+cfg.exp_note='Collective_train_' + cfg.backbone
 train_net(cfg)
