@@ -74,6 +74,22 @@ def sincos_encoding_2d(positions,d_emb):
     
     return embeddings
 
+def ncc_val(I,J):
+  I_mean = torch.mean(I)
+  J_mean = torch.mean(J)
+  I_std = torch.std(I)
+  J_std = torch.std(J)
+  ncc = torch.mean((I-I_mean)*(J-J_mean)/(I_std*J_std))
+  return ncc
+
+def calc_ncc(X, Y):
+    ncc_top_list = []
+    ncc_list = []
+    for i in range(12):
+        # todo: get each actor to compare with another 12 (include himself) using NCC to calculate a value and append into list
+        for j in range(12):
+            ncc_list.append(ncc_val(X[i], Y[j]))
+        ncc_top_list.append(ncc_list)
 
 def print_log(file_path,*args):
     print(*args)
