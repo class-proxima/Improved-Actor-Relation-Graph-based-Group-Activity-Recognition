@@ -1,14 +1,6 @@
-import torch 
-import torch.nn as nn
-import torch.nn.functional as F 
-
-import numpy as np
-
 from backbone import *
 from utils import *
 from roi_align.roi_align import RoIAlign      # RoIAlign module
-from roi_align.roi_align import CropAndResize # crop_and_resize module
-
 
 class GCN_Module(nn.Module):
     def __init__(self, cfg):
@@ -27,8 +19,7 @@ class GCN_Module(nn.Module):
         
         self.fc_rn_theta_list=torch.nn.ModuleList([ nn.Linear(NFG,NFR) for i in range(NG) ])
         self.fc_rn_phi_list=torch.nn.ModuleList([ nn.Linear(NFG,NFR) for i in range(NG) ])
-        
-        
+
         self.fc_gcn_list=torch.nn.ModuleList([ nn.Linear(NFG,NFG_ONE,bias=False) for i in range(NG) ])
         
         if cfg.dataset_name=='volleyball':
@@ -36,9 +27,7 @@ class GCN_Module(nn.Module):
         else:
             self.nl_gcn_list=torch.nn.ModuleList([ nn.LayerNorm([NFG_ONE]) for i in range(NG) ])
         
-            
 
-        
     def forward(self,graph_boxes_features,boxes_in_flat):
         """
         graph_boxes_features  [B*T,N,NFG]
@@ -61,27 +50,22 @@ class GCN_Module(nn.Module):
         graph_boxes_positions=graph_boxes_positions[:,:2].reshape(B,N,2)  #B*T, N, 2
         
         graph_boxes_distances=calc_pairwise_distance_3d(graph_boxes_positions,graph_boxes_positions)  #B, N, N
-        
         position_mask=( graph_boxes_distances > (pos_threshold*OW) )
-        
-        
+
         relation_graph=None
         graph_boxes_features_list=[]
         for i in range(NG):
             graph_boxes_features_theta=self.fc_rn_theta_list[i](graph_boxes_features)  #B,N,NFR
             graph_boxes_features_phi=self.fc_rn_phi_list[i](graph_boxes_features)  #B,N,NFR
 
-#             graph_boxes_features_theta=self.nl_rn_theta_list[i](graph_boxes_features_theta)
-#             graph_boxes_features_phi=self.nl_rn_phi_list[i](graph_boxes_features_phi)
 
+            # todo: use NCC or SAD value to represnet similarity relation graph
             similarity_relation_graph=torch.matmul(graph_boxes_features_theta,graph_boxes_features_phi.transpose(1,2))  #B,N,N
 
             similarity_relation_graph=similarity_relation_graph/np.sqrt(NFR)
 
             similarity_relation_graph=similarity_relation_graph.reshape(-1,1)  #B*N*N, 1
-            
-        
-        
+
             # Build relation graph
             relation_graph=similarity_relation_graph
 
@@ -216,15 +200,12 @@ class GCNnet_volleyball(nn.Module):
                                             boxes_idx_flat)  #B*T*N, D, K, K,
         
         boxes_features=boxes_features.reshape(B,T,N,-1)  #B,T,N, D*K*K
-        
-        
+
         # Embedding 
         boxes_features=self.fc_emb_1(boxes_features)  # B,T,N, NFB
         boxes_features=self.nl_emb_1(boxes_features)
         boxes_features=F.relu(boxes_features)
-        
-        
-        
+
         # GCN       
         graph_boxes_features=boxes_features.reshape(B,T*N,NFG)
         
@@ -269,10 +250,7 @@ class GCNnet_volleyball(nn.Module):
        
        
         return actions_scores, activities_scores
-       
-        
 
-        
 class GCNnet_collective(nn.Module):
     """
     main module of GCN for the collective dataset
@@ -332,8 +310,10 @@ class GCNnet_collective(nn.Module):
         
                 
     def forward(self,batch_data):
+        # images_in:batch*3_random_sample*3_channel*480*720
+        # boxes_in: w1, h1, w2, h2
         images_in, boxes_in, bboxes_num_in = batch_data
-        
+
         # read config parameters
         B=images_in.shape[0]
         T=images_in.shape[1]
@@ -419,10 +399,8 @@ class GCNnet_collective(nn.Module):
             boxes_features=boxes_features.reshape(1,T*N,NFB)
             boxes_states=graph_boxes_features+boxes_features  #1, T*N, NFG
             boxes_states=self.dropout_global(boxes_states)
-            
 
             NFS=NFG
-        
             boxes_states=boxes_states.reshape(T,N,NFS)
         
             # Predict actions
@@ -458,4 +436,3 @@ class GCNnet_collective(nn.Module):
 #         print(activities_scores.shape)
        
         return actions_scores, activities_scores
-        
