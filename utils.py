@@ -91,11 +91,24 @@ def calc_ncc(X, Y, index):
         for j in range(index):
             ncc_list.append(ncc_val(X[0][i], Y[0][j]))
         ncc_top_list.append(ncc_list)
-
+        
     ncc_top_list = np.array(ncc_top_list, dtype=np.float)
     ncc_top_list = torch.from_numpy(ncc_top_list).float()
 
     return ncc_top_list[None]
+
+def calc_sad(X, Y):
+   sad_all = []
+   for i in range(X.shape[1]):
+       sad_individual = []
+       x = X[0, i, :]
+       for j in range(Y.shape[1]):
+           y=Y[0, j, :]
+           l1_norm = torch.norm(x-y, p=1)
+           sad_individual.append(l1_norm)
+       sad_all.append(sad_individual)
+   sad_all = torch.unsqueeze(torch.FloatTensor(sad_all), dim=0)
+   return sad_all
 
 def print_log(file_path,*args):
     print(*args)
