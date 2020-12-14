@@ -82,14 +82,20 @@ def ncc_val(I,J):
   ncc = torch.mean((I-I_mean)*(J-J_mean)/(I_std*J_std))
   return ncc
 
-def calc_ncc(X, Y):
+def calc_ncc(X, Y, index):
     ncc_top_list = []
-    ncc_list = []
-    for i in range(12):
-        # todo: get each actor to compare with another 12 (include himself) using NCC to calculate a value and append into list
-        for j in range(12):
-            ncc_list.append(ncc_val(X[i], Y[j]))
+
+    for i in range(index):
+        ncc_list = []
+
+        for j in range(index):
+            ncc_list.append(ncc_val(X[0][i], Y[0][j]))
         ncc_top_list.append(ncc_list)
+
+    ncc_top_list = np.array(ncc_top_list, dtype=np.float)
+    ncc_top_list = torch.from_numpy(ncc_top_list).float()
+
+    return ncc_top_list[None]
 
 def print_log(file_path,*args):
     print(*args)
