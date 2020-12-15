@@ -58,12 +58,17 @@ class GCN_Module(nn.Module):
             ncc_relation_graph=calc_ncc(graph_boxes_features,graph_boxes_features, B*N)
             ncc_relation_graph=ncc_relation_graph.reshape(-1,1) #B*N*N, 1
 
+            # SAD
+            # sad_relation_graph = calc_sad(graph_boxes_features, graph_boxes_features)
+            # sad_relation_graph = sad_relation_graph.reshape(-1,1)
+
             #similarity_relation_graph=torch.matmul(graph_boxes_features_theta,graph_boxes_features_phi.transpose(1,2))  #B,N,N
             #similarity_relation_graph=similarity_relation_graph/np.sqrt(NFR)
             #similarity_relation_graph=similarity_relation_graph.reshape(-1,1)  #B*N*N, 1
 
             # Build relation graph
             #relation_graph=similarity_relation_graph
+            # relation_graph=sad_relation_graph.to(device=graph_boxes_features.device)    #SAD
             relation_graph=ncc_relation_graph.to(device=graph_boxes_features.device)
             relation_graph=relation_graph.reshape(B, N, N)
             relation_graph[position_mask]=-float('inf')
