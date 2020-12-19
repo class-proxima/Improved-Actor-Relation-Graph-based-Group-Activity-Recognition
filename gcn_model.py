@@ -52,19 +52,18 @@ class GCN_Module(nn.Module):
         relation_graph=None
         graph_boxes_features_list=[]
         for i in range(NG):
-
-
             if self.cfg.appearance_calc == 'NCC':
             # use NCC value to represent similarity relation graph
                 ncc_relation_graph=calc_ncc(graph_boxes_features,graph_boxes_features, B*N)
                 ncc_relation_graph=ncc_relation_graph.reshape(-1,1) #B*N*N, 1
                 relation_graph=ncc_relation_graph.to(device=graph_boxes_features.device)
-            elif self.cfg.appearance_calc == 'SAD':
 
+            elif self.cfg.appearance_calc == 'SAD':
             # use SAD value to represent similarity relation graph
                 sad_relation_graph = calc_sad(graph_boxes_features, graph_boxes_features)
                 sad_relation_graph = sad_relation_graph.reshape(-1,1)
                 relation_graph = sad_relation_graph.to(device=graph_boxes_features.device)
+
             elif self.cfg.appearance_calc == 'DotProduct':
             # use Dot product to represent similarity relation graph
                 graph_boxes_features_theta = self.fc_rn_theta_list[i](graph_boxes_features)  # B,N,NFR
