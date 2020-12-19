@@ -6,6 +6,7 @@ class GCN_Module(nn.Module):
     def __init__(self, cfg):
         super(GCN_Module, self).__init__()
         self.cfg=cfg
+        NFR = cfg.num_features_relation
         NG=cfg.num_graph
         N=cfg.num_boxes
         T=cfg.num_frames
@@ -13,8 +14,8 @@ class GCN_Module(nn.Module):
         NFG=cfg.num_features_gcn
         NFG_ONE=NFG
 
-        #self.fc_rn_theta_list=torch.nn.ModuleList([ nn.Linear(NFG,NFR) for i in range(NG) ])
-        #self.fc_rn_phi_list=torch.nn.ModuleList([ nn.Linear(NFG,NFR) for i in range(NG) ])
+        self.fc_rn_theta_list=torch.nn.ModuleList([ nn.Linear(NFG,NFR) for i in range(NG) ])
+        self.fc_rn_phi_list=torch.nn.ModuleList([ nn.Linear(NFG,NFR) for i in range(NG) ])
 
         self.fc_gcn_list=torch.nn.ModuleList([ nn.Linear(NFG,NFG_ONE,bias=False) for i in range(NG) ])
         
@@ -51,25 +52,28 @@ class GCN_Module(nn.Module):
         relation_graph=None
         graph_boxes_features_list=[]
         for i in range(NG):
-            #graph_boxes_features_theta=self.fc_rn_theta_list[i](graph_boxes_features)  #B,N,NFR
-            #graph_boxes_features_phi=self.fc_rn_phi_list[i](graph_boxes_features)  #B,N,NFR
 
-            # use NCC or SAD value to represent similarity relation graph
-            ncc_relation_graph=calc_ncc(graph_boxes_features,graph_boxes_features, B*N)
-            ncc_relation_graph=ncc_relation_graph.reshape(-1,1) #B*N*N, 1
 
-            # SAD
-            # sad_relation_graph = calc_sad(graph_boxes_features, graph_boxes_features)
-            # sad_relation_graph = sad_relation_graph.reshape(-1,1)
+            if self.cfg.appearance_calc == 'NCC':
+            # use NCC value to represent similarity relation graph
+                ncc_relation_graph=calc_ncc(graph_boxes_features,graph_boxes_features, B*N)
+                ncc_relation_graph=ncc_relation_graph.reshape(-1,1) #B*N*N, 1
+                relation_graph=ncc_relation_graph.to(device=graph_boxes_features.device)
+            elif self.cfg.appearance_calc == 'SAD':
 
-            #similarity_relation_graph=torch.matmul(graph_boxes_features_theta,graph_boxes_features_phi.transpose(1,2))  #B,N,N
-            #similarity_relation_graph=similarity_relation_graph/np.sqrt(NFR)
-            #similarity_relation_graph=similarity_relation_graph.reshape(-1,1)  #B*N*N, 1
+            # use SAD value to represent similarity relation graph
+                sad_relation_graph = calc_sad(graph_boxes_features, graph_boxes_features)
+                sad_relation_graph = sad_relation_graph.reshape(-1,1)
+                relation_graph = sad_relation_graph.to(device=graph_boxes_features.device)
+            elif self.cfg.appearance_calc == 'DotProduct':
+            # use Dot product to represent similarity relation graph
+                graph_boxes_features_theta = self.fc_rn_theta_list[i](graph_boxes_features)  # B,N,NFR
+                graph_boxes_features_phi = self.fc_rn_phi_list[i](graph_boxes_features)  # B,N,NFR
+                similarity_relation_graph=torch.matmul(graph_boxes_features_theta,graph_boxes_features_phi.transpose(1,2))  #B,N,N
+                similarity_relation_graph=similarity_relation_graph/np.sqrt(NFR)
+                similarity_relation_graph=similarity_relation_graph.reshape(-1,1)  #B*N*N, 1
+                relation_graph=similarity_relation_graph
 
-            # Build relation graph
-            #relation_graph=similarity_relation_graph
-            # relation_graph=sad_relation_graph.to(device=graph_boxes_features.device)    #SAD
-            relation_graph=ncc_relation_graph.to(device=graph_boxes_features.device)
             relation_graph=relation_graph.reshape(B, N, N)
             relation_graph[position_mask]=-float('inf')
             relation_graph=torch.softmax(relation_graph,dim=2)
