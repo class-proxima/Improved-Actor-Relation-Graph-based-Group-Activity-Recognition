@@ -12,7 +12,7 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.1296
 
 - Python `3.x`
 - install requirements using `pip install -r requirements.txt`
-- [RoIAlign for Pytorch](https://github.com/longcw/RoIAlign.pytorch)
+- [RoIAlign for Pytorch](https://github.com/longcw/RoIAlign.pytorch) (Remeber, to rename folder "roi_align" to something else, such as "roi_align_1")
 - Datasets: [Collective](http://vhosts.eecs.umich.edu/vision//activity-dataset.html) and [Augmented dataset](http://vhosts.eecs.umich.edu/vision//activity-dataset.html)
 
 
