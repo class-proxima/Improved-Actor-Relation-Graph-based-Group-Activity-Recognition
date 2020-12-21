@@ -62,7 +62,7 @@ class Config(object):
         self.gcn_layers=1  #number of GCN layers
         self.tau_sqrt=False
         self.pos_threshold=0.2  #distance mask threshold in position relation
-        self.appearance_calc = "DotProduct" #use NCC or SAD or DotProduct value to represent similarity relation graph
+        self.appearance_calc = "DotProduct" #based on our experiments, we suggest to use NCC or SAD to represent similarity relation graph instead of DotProduct
 
         # Training Parameters
         self.train_random_seed = 0
