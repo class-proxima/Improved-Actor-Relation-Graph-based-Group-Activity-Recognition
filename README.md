@@ -70,13 +70,11 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.1296
 ## Citation
 
 ```
-@inproceedings{ARXIV2020_ARG,
-      title={Video Understanding based on Human Action and Group Activity Recognition}, 
-      author={Zijian Kuang and Xinran Tie},
-      year={2020},
-      eprint={2010.12968},
-      archivePrefix={arXiv},
-      primaryClass={cs.CV}
+@inproceedings{CVPR2019_ARG,
+  title = {Learning Actor Relation Graphs for Group Activity Recognition},
+  author = {Jianchao Wu and Limin Wang and Li Wang and Jie Guo and Gangshan Wu},
+  booktitle = {CVPR},
+  year = {2019},
 }
 ```
 
