@@ -62,7 +62,7 @@ class Config(object):
         self.gcn_layers=1  #number of GCN layers
         self.tau_sqrt=False
         self.pos_threshold=0.2  #distance mask threshold in position relation
-        self.appearance_calc = "NCC" #use NCC or SAD or DotProduct value to represent similarity relation graph
+        self.appearance_calc = "DotProduct" #use NCC or SAD or DotProduct value to represent similarity relation graph
 
         # Training Parameters
         self.train_random_seed = 0
@@ -76,7 +76,7 @@ class Config(object):
         
         # Exp
         self.training_stage=1  #specify stage1 or stage2
-        self.stage1_model_path='result/stage1_epoch88_89.39%.pth'   #path of the base model, need to be set in stage2
+        self.stage1_model_path='result/stage1_inv3_90.91%.pth'   #path of the base model, need to be set in stage2
         self.stage2_model_path='result/stage2_epoch84_90.65%.pth'   #path of the gcn model, need to be set in stage3
         self.test_before_train=False
         self.exp_note='Group-Activity-Recognition'
