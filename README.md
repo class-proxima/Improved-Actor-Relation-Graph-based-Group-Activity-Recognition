@@ -1,9 +1,9 @@
 
-# Video Understanding based Group Activity Recognition
+# Video Understanding based on Group Activity Recognition
 
 Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.12968)):
 
-        Video Understanding based Group Activity Recognition
+        Video Understanding based on Group Activity Recognition
         Zijian Kuang, Xinran Tie
 
 
