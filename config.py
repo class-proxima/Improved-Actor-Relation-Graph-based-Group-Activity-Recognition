@@ -33,10 +33,13 @@ class Config(object):
             self.data_path='data/collective/ActivityDataset'  #data path for the collective dataset
             self.test_seqs=[5,6,7,8,9,10,11,15,16,25,28,29,52,53,59,60,64,66,68,70,71]
             self.train_seqs=[s for s in range(1,73) if s not in self.test_seqs]
-        
+
+        # START: Original code by Zijian and Xinran
         # Backbone 
         self.backbone='inv3'
         #self.backbone='mobilenet'
+        # END: Original code by Zijian and Xinran
+
         self.crop_size = 5, 5  #crop size of roi align
         self.train_backbone = False  #if freeze the feature extraction part of network, True for stage 1, False for stage 2
         self.out_size = 87, 157  #output feature map size of backbone 
@@ -62,7 +65,10 @@ class Config(object):
         self.gcn_layers=1  #number of GCN layers
         self.tau_sqrt=False
         self.pos_threshold=0.2  #distance mask threshold in position relation
+
+        # START: Original code by Zijian and Xinran
         self.appearance_calc = "DotProduct" #based on our experiments, we suggest to use NCC or SAD to represent similarity relation graph instead of DotProduct
+        # END: Original code by Zijian and Xinran
 
         # Training Parameters
         self.train_random_seed = 0

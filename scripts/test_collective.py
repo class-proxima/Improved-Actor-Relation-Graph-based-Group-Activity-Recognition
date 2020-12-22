@@ -1,3 +1,4 @@
+# START: Original code by Zijian and Xinran
 import sys
 sys.path.append(".")
 from test_net import *
@@ -27,3 +28,4 @@ cfg.max_epoch=50
 
 cfg.exp_note='Collective_test_' + cfg.backbone
 test_net(cfg)
+# END: Original code by Zijian and Xinran

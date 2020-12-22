@@ -51,6 +51,8 @@ class GCN_Module(nn.Module):
 
         relation_graph=None
         graph_boxes_features_list=[]
+
+        # START: Original code by Zijian and Xinran
         for i in range(NG):
             if self.cfg.appearance_calc == 'NCC':
             # use NCC value to represent similarity relation graph
@@ -72,6 +74,7 @@ class GCN_Module(nn.Module):
                 similarity_relation_graph=similarity_relation_graph/np.sqrt(NFR)
                 similarity_relation_graph=similarity_relation_graph.reshape(-1,1)  #B*N*N, 1
                 relation_graph=similarity_relation_graph
+        # END: Original code by Zijian and Xinran
 
             relation_graph=relation_graph.reshape(B, N, N)
             relation_graph[position_mask]=-float('inf')
@@ -265,6 +268,7 @@ class GCNnet_collective(nn.Module):
         NFB=self.cfg.num_features_boxes
         NFR, NFG=self.cfg.num_features_relation, self.cfg.num_features_gcn
 
+        # START: Original code by Zijian and Xinran
         if cfg.backbone == 'inv3':
             self.backbone = MyInception_v3(transform_input=False, pretrained=True)
         elif cfg.backbone == 'vgg16':
@@ -285,6 +289,7 @@ class GCNnet_collective(nn.Module):
             self.fc_emb_1 = nn.Linear(K * K * D, NFB)
         elif cfg.backbone == 'mobilenet':
             self.fc_emb_1 = nn.Linear(32000, NFB)
+        # END: Original code by Zijian and Xinran
 
         self.nl_emb_1=nn.LayerNorm([NFB])
         self.gcn_list = torch.nn.ModuleList([ GCN_Module(self.cfg)  for i in range(self.cfg.gcn_layers) ])    

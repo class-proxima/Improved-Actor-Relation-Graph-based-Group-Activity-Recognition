@@ -74,6 +74,7 @@ def sincos_encoding_2d(positions,d_emb):
     
     return embeddings
 
+# START: Original code by Zijian and Xinran
 def ncc_val(I,J):
   I_mean = torch.mean(I)
   J_mean = torch.mean(J)
@@ -109,6 +110,7 @@ def calc_sad(X, Y):
        sad_all.append(sad_individual)
    sad_all = torch.unsqueeze(torch.FloatTensor(sad_all), dim=0)
    return sad_all
+# END: Original code by Zijian and Xinran
 
 def print_log(file_path,*args):
     print(*args)
