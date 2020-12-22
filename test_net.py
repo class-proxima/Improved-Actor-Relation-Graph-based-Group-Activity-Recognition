@@ -11,6 +11,7 @@ from matplotlib.patches import Rectangle
 import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 
+
 def test_net(cfg):
     '''
     test gcn net
