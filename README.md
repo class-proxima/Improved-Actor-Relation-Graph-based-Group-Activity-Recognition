@@ -40,12 +40,14 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.1296
 
     ```shell
     # collective dataset
+    update the stage1_model_path (path of the base model checkpoint) in config.py, and then run the script below:
     python scripts/train_collective_stage2.py
     ```
 
 3. Test: Test the result using test video clips.
     ```shell
     # collective dataset
+    update the stage2_model_path (path of the GCN model checkpoint) in config.py, and then run the script below:
     python scripts/test_collective.py
     ```
     
@@ -63,7 +65,7 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.1296
    
 1. Our expirements proved that using MobileNet as backbone in feature extraction will improve the training speed by 35%.
 
-2. Our expirements proved that using NCC or SAD to calculate the pair-wise acotrs' appearance similarty and draw the actor relation graph can improve the group activity prediction accuracy.
+2. Our expirements proved that using NCC or SAD to calculate the pair-wise actors' appearance similarty and draw the actor relation graph can improve the group activity prediction accuracy.
 
    ![3](https://github.com/kuangzijian/Group-Activity-Recognition/blob/master/read_me_pictures/experiments.png)
    
