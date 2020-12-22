@@ -78,6 +78,8 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.1296
   booktitle = {CVPR},
   year = {2019},
 }
+
+Original github link: https://github.com/wjchaoGit/Group-Activity-Recognition
 ```
 
 
