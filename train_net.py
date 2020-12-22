@@ -7,7 +7,6 @@ import os
 import sys
 
 from config import *
-from volleyball import *
 from collective import *
 from dataset import *
 from gcn_model import *
