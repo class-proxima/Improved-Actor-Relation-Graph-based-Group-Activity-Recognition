@@ -72,8 +72,7 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.1296
 ## Acknowledgements
 
 
-The majority of our project is based on J. Wu et al.'s work, our original contributions include changes:
-    
+The majority of our project is based on J. Wu et al.'s work, our original contributions (are commented as "Original code by Zijian and Xinran" in each .py file) include changes:    
 1. [backbone.py](https://github.com/kuangzijian/UAlberta-Multimedia-Master-Program-Group-Activity-Recognition/blob/master/backbone.py)
 
 2. [base_model.py](https://github.com/kuangzijian/UAlberta-Multimedia-Master-Program-Group-Activity-Recognition/blob/master/base_model.py)
