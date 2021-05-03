@@ -6,7 +6,7 @@ Source code for the following paper([arXiv link](https://arxiv.org/abs/2010.1296
         Improved Actor Relation Graph based Group Activity Recognition
         Zijian Kuang, Xinran Tie
 
-
+![0](https://github.com/kuangzijian/Improved-Actor-Relation-Graph-based-Group-Activity-Recognition/blob/master/read_me_pictures/fig1.png)
 
 ## Dependencies
 
