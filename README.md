@@ -1,9 +1,9 @@
 
 # Improved Actor Relation Graph based Group Activity Recognition
 
-Source code for the following paper([arXiv link](https://arxiv.org/pdf/2012.06737v1.pdf)):
+Source code for the following paper([arXiv link](https://arxiv.org/pdf/2010.12968v2.pdf)):
 
-        Computer Vision and Normalizing Flow Based Defect Detection
+        Improved Actor Relation Graph based Group Activity Recognition
         Zijian Kuang, Xinran Tie
 
 ![0](https://github.com/kuangzijian/Improved-Actor-Relation-Graph-based-Group-Activity-Recognition/blob/master/read_me_pictures/fig1.png)
