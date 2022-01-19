@@ -23,7 +23,17 @@ Source code for the following paper([arXiv link](https://arxiv.org/pdf/2010.1296
 2. Unzip the dataset file into `data/collective`.
 3. The folder structure should looks like: 
 
-   ![1](https://github.com/kuangzijian/Group-Activity-Recognition/blob/master/read_me_pictures/folder_structure.png)
+   <pre>.
+    └── data
+        ├── collective
+            ├── ActivityDataset
+                ├── seq01
+                    ├── 9374.jpg
+                    ├── 9375.jpg
+                    └── ... (3,125 files)    
+                ├── seq02
+                └── seq03
+
 
 
 
